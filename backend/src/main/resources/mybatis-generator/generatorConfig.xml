@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+
+    <classPathEntry
+            location="D:/software/mysql-5.7.21-winx64/mysql-connector-java-5.1.44-bin.jar"/>
+    <context id="MysqlTables" targetRuntime="MyBatis3">
+        <!--//mysql5和mysql6的区别 com.mysql.jdbc.Driver和com.mysql.cj.jdbc.Driver（需要指定时区）-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://192.168.109.137:3306/cram?useSSL=false;nullNamePatternMatchesAll=true" userId="root"
+                        password="ZRX">
+        </jdbcConnection>
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!-- 注意这里的路径，如果工程文件地址变了，这里也需要更改 -->
+        <javaModelGenerator targetPackage="cn.edu.buaa.rec.model"
+                            targetProject="D:/CRAM-master (1)/CRAM-master/backend/src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+        <sqlMapGenerator targetPackage="cn.edu.buaa.rec.mapper"
+                         targetProject="D:/CRAM-master (1)/CRAM-master/backend/src/main/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="cn.edu.buaa.rec.dao"
+                             targetProject="D:/CRAM-master (1)/CRAM-master/backend/src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+
+        
+        <!-- 自动生成完一个表的MVC代码后，记着注释掉；否则，自动生成会替换掉已更新的文件-->
+        <table  tableName="usecase_role_data" enableCountByExample="false"
+            enableUpdateByExample="false" enableDeleteByExample="false"
+            enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+    </context>
+
+</generatorConfiguration>

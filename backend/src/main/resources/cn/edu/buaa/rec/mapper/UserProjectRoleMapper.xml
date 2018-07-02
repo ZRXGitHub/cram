@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.buaa.rec.dao.UserProjectRoleMapper">
+    <resultMap id="BaseResultMap" type="cn.edu.buaa.rec.model.UserProjectRole">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="project_id" jdbcType="BIGINT" property="projectId"/>
+        <result column="role_id" jdbcType="BIGINT" property="roleId"/>
+        <result column="is_creator" jdbcType="INTEGER" property="isCreator"/>
+        <result column="isApproved" jdbcType="INTEGER" property="isapproved"/>
+        <result column="explanation" jdbcType="LONGVARCHAR" property="explanation"/>
+    </resultMap>
+    <insert id="insert" parameterType="cn.edu.buaa.rec.model.UserProjectRole">
+    insert into user_project_role (id, user_id, project_id, 
+      role_id, is_creator, isApproved,explanation
+      )
+    values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{projectId,jdbcType=BIGINT}, 
+      #{roleId,jdbcType=BIGINT}, #{isCreator,jdbcType=INTEGER}, #{isapproved,jdbcType=INTEGER}, #{explanation,jdbcType=LONGVARCHAR})
+  </insert>
+    <select id="selectByProjectIdAndUserId" resultType="Long">
+    SELECT role_id
+    from user_project_role
+    where project_id=#{projectId} AND user_id=#{userId}
+  </select>
+
+    <select id="selectUserByProjectId" resultType="Long" parameterType="java.util.List">
+        SELECT user_id
+        FROM user_project_role
+        WHERE isApproved=0 AND project_id IN
+        <foreach collection="projectIds" item="projectId" index="index" open="(" close=")"
+                 separator=",">
+            #{projectId}
+        </foreach>
+    </select>
+
+    <select id="selectProjectByUserIdWithNoApproved" resultType="Long" parameterType="Long">
+    SELECT project_id
+    FROM user_project_role
+    WHERE user_id = #{userId}
+  </select>
+
+    <!--List<UserProjectRole> selectRoleApply(@Param("manProjectIds") List<Long> manProjectIds);-->
+    <!-- 根据用户管理的projects，去查查找这些项目中，需要审批的角色申请-->
+    <select id="selectRoleApplyByProjectId" resultMap="BaseResultMap" parameterType="Long">
+        SELECT *
+        FROM user_project_role
+        WHERE project_id=#{projectId} AND isApproved=0
+    </select>
+
+    <!--int updateIsApprovedById(@Param("id") Long id, @Param("isapproved") Integer isapproved);-->
+    <update id="updateApprovedById">
+        UPDATE user_project_role
+        SET isApproved=#{isapproved}
+        WHERE id=#{id}
+    </update>
+
+    <!-- 查找现有记录的最大id -->
+    <!-- max后面不能有空格 -->
+    <select id="selectMaxId" resultType="Long">
+        SELECT max(id)
+        FROM user_project_role
+    </select>
+
+
+</mapper>

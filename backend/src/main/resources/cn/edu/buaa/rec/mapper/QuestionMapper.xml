@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.buaa.rec.dao.QuestionMapper">
+    <resultMap id="BaseResultMap" type="cn.edu.buaa.rec.model.Question">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="build_time" jdbcType="TIMESTAMP" property="buildTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="creator_id" jdbcType="BIGINT" property="creatorId"/>
+        <result column="project_id" jdbcType="BIGINT" property="projectId"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="cn.edu.buaa.rec.model.Question">
+
+    insert into question (id, title, build_time, 
+      update_time, creator_id, project_id, 
+      type, content)
+    values (#{id,jdbcType=BIGINT}, #{title,jdbcType=VARCHAR}, #{buildTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{creatorId,jdbcType=BIGINT}, #{projectId,jdbcType=BIGINT}, 
+      #{type,jdbcType=INTEGER}, #{content,jdbcType=LONGVARCHAR})
+  </insert>
+    <select id="selectByProjectId" parameterType="Long" resultMap="BaseResultMap">
+    SELECT *
+    FROM question
+    where project_id=#{projectiId}
+  </select>
+
+    <!-- 查找现有记录的最大id -->
+    <!-- max后面不能有空格 -->
+    <select id="selectMaxId" resultType="Long">
+        SELECT max(id)
+        FROM question
+    </select>
+
+    <!-- 根据title 和 projectId，查找该问题是否存在 -->
+    <select id="checkByTitleAndProjectId"  resultType="Integer">
+        SELECT count(*)
+        FROM question
+        WHERE title = #{title} AND project_id = #{projectId}
+    </select>
+    <select id="selectByProjectIdToBussiness" parameterType="Long" resultType="java.util.Map">
+      SELECT tt.id, tt.title, tt.content, b.name as settings
+      from (select q.id, q.title, q.content, qb.business_id
+            from question q
+            left join question_business qb
+            on q.id = qb.question_id
+            where q.project_id=#{projectId}) tt
+      left join business b
+      on tt.business_id = b.id
+
+    </select>
+
+    <select id="selectByProjectIdToUsecase" parameterType="Long" resultType="java.util.Map">
+
+      SELECT tt.id, tt.title, tt.content, b.name as settings
+      from (select q.id, q.title, q.content, qb.usecase_id
+            from question q
+            left join question_usecase qb
+            on q.id = qb.usecase_id
+            where q.project_id=#{projectId}) tt
+      left join usecase b
+      on tt.usecase_id = b.id
+    </select>
+
+    <select id="selectByUserId" parameterType="Long" resultType="java.util.Map">
+        SELECT tt.id, tt.title, tt.content, q.title as question
+        from (select s.id, s.title, s.content, sq.question_id
+        from solution s
+        left join solution_question sq
+        on s.id = sq.solution_id
+        where s.creator_id=#{userId}) tt
+        left join question q
+        on tt.question_id = q.id
+    </select>
+
+    <select id="selectByProjectIdAndUserIdToBussiness"  resultType="java.util.Map">
+
+      SELECT tt.id, tt.title, tt.content, b.name as settings
+      from (select q.id, q.title, q.content, qb.business_id
+            from question q
+            left join question_business qb
+            on q.id = qb.business_id
+            where q.project_id=#{projectId} and q.creator_id=#{userId}) tt
+      left join business b
+      on tt.business_id = b.id
+
+    </select>
+
+    <select id="selectByProjectIdAndUserIdToUsecase"  resultType="java.util.Map">
+
+      SELECT tt.id, tt.title, tt.content, b.name as settings
+      from (select q.id, q.title, q.content, qb.usecase_id
+            from question q
+            left join question_usecase qb
+            on q.id = qb.usecase_id
+            where q.project_id=#{projectId} and q.creator_id=#{userId}) tt
+      left join usecase b
+      on tt.usecase_id = b.id
+
+    </select>
+
+    <delete id="delete" parameterType="Long">
+        DELETE from question where id=#{id}
+    </delete>
+
+
+
+</mapper>
